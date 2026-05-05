@@ -1,0 +1,4 @@
+.claude/scheduled_tasks.lock
+.direnv/
+result
+.sops/
