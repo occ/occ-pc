@@ -11,6 +11,7 @@
       ezgi_hashed_password = {
         neededForUsers = true;
       };
+      google_geolocation_api_key = { };
     };
   };
 }

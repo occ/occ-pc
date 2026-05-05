@@ -22,7 +22,13 @@
   location.provider = "geoclue2";
   services.geoclue2 = {
     enable = true;
-    geoProviderUrl = "https://www.googleapis.com/geolocation/v1/geolocate?key=AIzaSyBKyzTx2Ac7GxkOJeGe6UoXFH2JqTWgm84";
+    geoProviderUrl = "https://www.googleapis.com/geolocation/v1/geolocate?key=${config.sops.placeholder.google_geolocation_api_key}";
     submitData = false;
   };
+
+  sops.templates."geoclue.conf".content =
+    config.environment.etc."geoclue/geoclue.conf".text;
+
+  environment.etc."geoclue/geoclue.conf".source =
+    lib.mkForce config.sops.templates."geoclue.conf".path;
 }
