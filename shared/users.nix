@@ -6,6 +6,17 @@
   ...
 }:
 {
+  sops.secrets = {
+    occ_hashed_password = {
+      sopsFile = ./users.sops.yaml;
+      neededForUsers = true;
+    };
+    ezgi_hashed_password = {
+      sopsFile = ./users.sops.yaml;
+      neededForUsers = true;
+    };
+  };
+
   users = {
     mutableUsers = false;
 

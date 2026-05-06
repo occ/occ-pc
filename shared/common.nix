@@ -8,6 +8,8 @@
   nixpkgs.config.allowUnfree = true;
   system.stateVersion = "25.11";
 
+  sops.secrets.nix_cache_priv_key.sopsFile = ./common.sops.yaml;
+
   imports = [
     ./boot.nix
     ./epson-et-3950.nix

@@ -19,6 +19,8 @@
     LC_TIME = "en_US.UTF-8";
   };
 
+  sops.secrets.google_geolocation_api_key.sopsFile = ./locale.sops.yaml;
+
   location.provider = "geoclue2";
   services.geoclue2 = {
     enable = true;
