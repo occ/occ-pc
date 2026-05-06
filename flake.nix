@@ -116,6 +116,7 @@
           nixpkgs-fmt
           nixVersions.latest
           sops
+          yq-go
         ];
 
         shellHook = ''
