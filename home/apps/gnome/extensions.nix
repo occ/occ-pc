@@ -14,6 +14,7 @@
     desktop-cube
     hide-top-bar
     notification-banner-reloaded
+    proton-vpn-button
     tray-icons-reloaded
     user-themes
   ] ++ (with pkgs; [
