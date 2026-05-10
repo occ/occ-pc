@@ -58,7 +58,6 @@ in
     pkgs-unstable.antigravity-fhs
     appimage-run
     pkgs-unstable.aptakube
-    codex
     dig
     discord
     firefox
