@@ -76,6 +76,10 @@ in
 
   networking.hostName = "occ-laptop";
   networking.networkmanager.enable = true;
+  # WireGuard support is built into NetworkManager; only OpenVPN needs a plugin.
+  networking.networkmanager.plugins = with pkgs; [
+    networkmanager-openvpn
+  ];
 
   security.tpm2.enable = true;
 
