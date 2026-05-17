@@ -38,15 +38,6 @@ let
       (old.postPatch or "");
   });
 
-  # VirtualBox 7.2.8 — official 6.19/7.0 host driver support
-  # (released 2026-04-21). Drop once nixpkgs PR #512148 merges.
-  virtualbox728 = pkgs-unstable.virtualbox.overrideAttrs (_old: rec {
-    version = "7.2.8";
-    src = pkgs.fetchurl {
-      url = "https://download.virtualbox.org/virtualbox/${version}/VirtualBox-${version}.tar.bz2";
-      hash = "sha256-BkLtShK3IEzTDAq7wsEMHMetVc4XVqAehqFtS2sGZZI=";
-    };
-  });
 in
 {
   imports = [
@@ -61,7 +52,7 @@ in
   # so its virtualbox host modules are built from the 7.2.8 modsrc.
   boot.kernelPackages = pkgs-unstable.linuxPackages_7_0.extend (_kfinal: kprev: {
     zfs_unstable = zfsTo7 kprev.zfs_unstable;
-    virtualbox = kprev.virtualbox.override { virtualbox = virtualbox728; };
+    virtualbox = kprev.virtualbox.override { virtualbox = pkgs-unstable.virtualbox; };
   });
 
   # Default boot.zfs.package is stable zfs (2.3.x) which caps at 6.19.
@@ -70,7 +61,12 @@ in
 
   nixpkgs.overlays = [
     (final: prev: {
-      virtualbox = virtualbox728;
+      virtualbox = pkgs-unstable.virtualbox;
+      # nix-amd-ai's amd-npu module references pkgs.stable-diffusion-cpp
+      # directly (enableImageGen defaults true), but that package only
+      # exists in nixos-unstable, not our pinned nixos-25.11. Pull it from
+      # unstable so the lemonade image-gen recipes resolve.
+      stable-diffusion-cpp = pkgs-unstable.stable-diffusion-cpp;
     })
   ];
 
