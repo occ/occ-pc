@@ -63,19 +63,21 @@
   systemd.services =
     let
       # Refuse to decrypt until /dev/tpmrm0 exists, or the TPM unseal fails and
-      # every account is locked out. The for-users unit runs very early in boot.
-      waitForTpm = {
-        after = [ "dev-tpmrm0.device" ];
-        wants = [ "dev-tpmrm0.device" ];
-        serviceConfig.ExecStartPre = pkgs.writeShellScript "wait-for-tpm" ''
-          for _ in $(${pkgs.coreutils}/bin/seq 1 100); do
-            [ -e /dev/tpmrm0 ] && exit 0
-            ${pkgs.coreutils}/bin/sleep 0.1
-          done
-          echo "wait-for-tpm: /dev/tpmrm0 never appeared" >&2
-          exit 1
-        '';
-      };
+      # every account is locked out. The for-users unit runs very early
+      # (DefaultDependencies=no, before sysinit) -- do NOT order against the
+      # dev-tpmrm0.device unit there: it isn't active that early and systemd
+      # blocks forever ("Expecting device /dev/tpmrm0..."), hanging the boot.
+      # devtmpfs creates the node as soon as the tpm driver binds, and this unit
+      # runs as root (no tss-group udev rule needed), so polling the node is
+      # enough.
+      waitForTpm.serviceConfig.ExecStartPre = pkgs.writeShellScript "wait-for-tpm" ''
+        for _ in $(${pkgs.coreutils}/bin/seq 1 100); do
+          [ -e /dev/tpmrm0 ] && exit 0
+          ${pkgs.coreutils}/bin/sleep 0.1
+        done
+        echo "wait-for-tpm: /dev/tpmrm0 never appeared" >&2
+        exit 1
+      '';
     in
     {
       # Materialise the committed TPM identity into tmpfs before either sops
