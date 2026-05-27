@@ -109,6 +109,7 @@
 
         packages = with pkgs-unstable; [
           age
+          age-plugin-tpm
           nil
           nixd
           nixfmt

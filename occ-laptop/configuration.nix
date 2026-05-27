@@ -43,6 +43,63 @@
 
   security.tpm2.enable = true;
 
+  # --- sops decryption via a TPM-backed age identity ----------------------
+  # Replaces the hand-copied /var/lib/sops-nix/occ-pc.key. The identity only
+  # unseals on this machine's TPM (no PCR binding, no PIN), so it's safe to
+  # ship in the closure: ./tpm-identity.txt is materialised into tmpfs at boot,
+  # before sops needs it. The dev age key stays a recipient (.sops.yaml) for
+  # offline recovery / re-keying if the TPM is ever cleared.
+  sops.age = {
+    keyFile = "/run/sops-tpm-identity.txt";
+    plugins = [ pkgs.age-plugin-tpm ];
+  };
+
+  # userborn (not the legacy users activation script) moves user + secret setup
+  # into systemd units, so the early password-secret install can be ordered
+  # after the TPM device is ready. systemd-sysusers would force
+  # mutableUsers = true (sops-nix assertion); userborn supports immutable users.
+  services.userborn.enable = true;
+
+  systemd.services =
+    let
+      # Refuse to decrypt until /dev/tpmrm0 exists, or the TPM unseal fails and
+      # every account is locked out. The for-users unit runs very early in boot.
+      waitForTpm = {
+        after = [ "dev-tpmrm0.device" ];
+        wants = [ "dev-tpmrm0.device" ];
+        serviceConfig.ExecStartPre = pkgs.writeShellScript "wait-for-tpm" ''
+          for _ in $(${pkgs.coreutils}/bin/seq 1 100); do
+            [ -e /dev/tpmrm0 ] && exit 0
+            ${pkgs.coreutils}/bin/sleep 0.1
+          done
+          echo "wait-for-tpm: /dev/tpmrm0 never appeared" >&2
+          exit 1
+        '';
+      };
+    in
+    {
+      # Materialise the committed TPM identity into tmpfs before either sops
+      # install unit reads sops.age.keyFile.
+      provide-sops-tpm-identity = {
+        before = [
+          "sops-install-secrets.service"
+          "sops-install-secrets-for-users.service"
+        ];
+        requiredBy = [
+          "sops-install-secrets.service"
+          "sops-install-secrets-for-users.service"
+        ];
+        unitConfig.DefaultDependencies = false;
+        serviceConfig = {
+          Type = "oneshot";
+          RemainAfterExit = true;
+          ExecStart = "${pkgs.coreutils}/bin/install -m600 -o root -g root ${./tpm-identity.txt} /run/sops-tpm-identity.txt";
+        };
+      };
+      sops-install-secrets = waitForTpm;
+      sops-install-secrets-for-users = waitForTpm;
+    };
+
   services = {
     flatpak.enable = true;
     smartd.enable = true;

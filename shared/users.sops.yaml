@@ -2,15 +2,25 @@ occ_hashed_password: ENC[AES256_GCM,data:qIRXWMR5UKd4mgGcsiHjbvJg/zjLBX4LDXzMxf5
 ezgi_hashed_password: ENC[AES256_GCM,data:w+8GG/U1pb0m4JJTpy/2UhhO+hsALJStijJAuDOfT9BM7krxFgu0Hvhy+OV1TZJ0HP2OF10dCBheIsQofv0yvbvFr6jU62jnQQ==,iv:S8RDf5zOnXwcyOABItrIurctBqew9GQ3l1GfouwgVXQ=,tag:vRA8ct/qE1JqRfamk5REfw==,type:str]
 sops:
     age:
-        - recipient: age1hweznu2yycd8p3qvyfegfsq68g8w6afp6y47e04jvucughqtc9ysmyc2dg
-          enc: |
+        - enc: |
             -----BEGIN AGE ENCRYPTED FILE-----
-            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBHUGU2YnJCbmlwQit0NmhH
-            aGdISmhTTy9nS1NqbVBDN2F1VFZXc0pPK0RzCnEwR3lwZCtHbHI3T3YzS0x3VzlH
-            NW1NK1ZoeVVFak1JR0djVEIyMllPWVEKLS0tIDNSZHZFTFhzR1VQMHZ2V1Zna1JN
-            dVRkQjR5VS83bTdsLzdyYnhjT2REcWMKolRDAq9UOR1w3zRAtwPeE6FWfIe5EoKF
-            2el4AgOMpQbUsG3NOXpmyF6xNlDTsfZSq301VZ/ti2Hll8HO5WpheA==
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBKNjlnbmFoaVZPemFoRElR
+            T1JNR1AxWGVDejRqSkUxbUNQeStZdTRVbFdBCm1mTGVZTVJoYVFaQm1WK2VIcWRU
+            ZDdVQ0x3VnR3TzgxcGszUmFiTTVFM0kKLS0tIFJ2VWQydSt5MlhyTk9CT2xGaFps
+            eTZrRkk5QzNSQXVtSmlJWXJVU0k3M2sKbC9ltW1KnLZZ0HuX+1igFUCvh4Bb9VW4
+            5xn0iZtJA1xwmX9HPNWGshPomNUuZ2lD4EGJNmVXsHTYtphwheYYrg==
             -----END AGE ENCRYPTED FILE-----
+          recipient: age1hweznu2yycd8p3qvyfegfsq68g8w6afp6y47e04jvucughqtc9ysmyc2dg
+        - enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IHRwbS1lY2MgQnFwbmJ3IEF3UTIzdFdW
+            ZmRwTWNGWllWMVlaakxBanB6elJOOUpHdE1NSVRLdzY3cGFkCngycS9NVmVjUUpn
+            ZVNzbUJjZjVEdEdNakZ2ZmFTcjhTQ244cXJpVEtpU0EKLS0tIEJFRjV1V2Zjcm5R
+            QTJHdDVRSGZCMjhIL3JUNFE2WktDOXN1K3hJdjJDYUEK+8wNj3XJiqlif+EfBLGZ
+            xoERRCroLQhjPP7X2Yh5H7cHR/q+PXBq0jdU2/7TApSpMvNifZKuLy61iLFBpB/h
+            JQ==
+            -----END AGE ENCRYPTED FILE-----
+          recipient: age1tpm1qwgfgk49hm53pmv7h5hkamw7gvjpm4cz9ly3j9662lzvja9x9qle5ydpal3
     lastmodified: "2026-05-06T02:35:54Z"
     mac: ENC[AES256_GCM,data:Keck3VN1h7wdsvzoZLBHoQhPMkZ84mfiUL/OHRaW+sm3xVFQnDgOfZ/BQpF4s0YlIFQsUZ4DNOwawy14TIZzTOHNRAB55dqJBOjbX+0Cb9s+GfpEu+OU1wAspYVQ0Ow1m+H3EKzpLfhafwBcvltzm+2u7Vu6xAxX6O3fb5doeKM=,iv:TjrT12wkPxtbQh5E6PdqSR61KENI0hJbw+abO0FQGLQ=,tag:eyfS1M4QW9JpsZa7n7cEiw==,type:str]
     unencrypted_suffix: _unencrypted

@@ -1,7 +1,12 @@
 keys:
   - &dev age1hweznu2yycd8p3qvyfegfsq68g8w6afp6y47e04jvucughqtc9ysmyc2dg
+  # occ-laptop TPM-backed identity (no PCR binding). Decrypts only on that
+  # machine's TPM; the matching identity file lives at
+  # /var/lib/sops-nix/occ-laptop-tpm.txt (committed copy: occ-laptop/tpm-identity.txt).
+  - &occ_laptop_tpm age1tpm1qwgfgk49hm53pmv7h5hkamw7gvjpm4cz9ly3j9662lzvja9x9qle5ydpal3
 creation_rules:
   - path_regex: .*\.sops\.yaml$
     key_groups:
       - age:
           - *dev
+          - *occ_laptop_tpm
