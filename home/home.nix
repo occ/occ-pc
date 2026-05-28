@@ -24,6 +24,7 @@ in
     ./apps/rust-rover
     ./apps/starship
     ./apps/vscode
+    ./settings/espresso-display.nix
     ./settings/vrr.nix
     # android-nixpkgs.hmModule
     # {

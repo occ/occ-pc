@@ -118,6 +118,9 @@
     ];
   };
 
+  # DDC/CI brightness control for the external Espresso display (ddcutil over i2c).
+  hardware.i2c.enable = true;
+
   # Skip hid-generic driver for MX Ergo so logitech-hidpp binds directly,
   # avoiding a double driver handoff race that delays input after BT reconnect
   services.udev.extraRules = ''
@@ -133,6 +136,7 @@
 
   environment.systemPackages = with pkgs; [
     clevis
+    ddcutil
     # intel-gpu-tools
     libva-utils
   ];

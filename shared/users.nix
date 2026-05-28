@@ -27,6 +27,7 @@
         "adbusers"
         "dialout"
         "docker"
+        "i2c"
         "input"
         "kvm"
         "libvirtd"
