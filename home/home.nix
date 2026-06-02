@@ -96,7 +96,7 @@ in
     "vim" = "nvim";
   };
 
-  home.stateVersion = "25.11";
+  home.stateVersion = "26.05";
 
   programs = {
     direnv = {

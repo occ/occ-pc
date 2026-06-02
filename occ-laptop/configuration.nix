@@ -13,7 +13,7 @@
     inputs.nix-amd-ai.nixosModules.default
   ];
 
-  # Linux 6.19 is EOL and removed from nixpkgs (2026-04-23). Pinned 25.11's
+  # Linux 6.19 is EOL and removed from nixpkgs (2026-04-23). Pinned 26.05's
   # linuxPackages_7_0 has a broken zfs_unstable (2.4.0) and only an older
   # virtualbox module, so take the kernel set from unstable: it ships
   # zfs_unstable 2.4.2 (7.0-compatible) and virtualbox-modules 7.2.8.
@@ -28,7 +28,7 @@
       virtualbox = pkgs-unstable.virtualbox;
       # nix-amd-ai's amd-npu module references pkgs.stable-diffusion-cpp
       # directly (enableImageGen defaults true), but that package only
-      # exists in nixos-unstable, not our pinned nixos-25.11. Pull it from
+      # exists in nixos-unstable, not our pinned nixos-26.05. Pull it from
       # unstable so the lemonade image-gen recipes resolve.
       stable-diffusion-cpp = pkgs-unstable.stable-diffusion-cpp;
     })
