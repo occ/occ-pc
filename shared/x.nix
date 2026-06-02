@@ -20,7 +20,8 @@
 
     displayManager.gdm = {
       enable = true;
-      wayland = true;
+      # GNOME 50 dropped X11; GDM is always Wayland now, so the `wayland`
+      # option was removed (any definition trips an assertion).
     };
 
     gnome.gnome-keyring.enable = true;
