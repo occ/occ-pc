@@ -131,6 +131,10 @@
     enable = true;
     enableFastFlowLM = true;
     enableLemonade = true;
+    # Vulkan (RADV) offload for the Radeon 890M (gfx1150). Installs
+    # llama-cpp-vulkan ahead of the CPU build on PATH, so llama-server and
+    # lemonade's llama.cpp backend run on the iGPU instead of CPU/BLAS.
+    enableVulkan = true;
     lemonade.user = "occ";
   };
 
