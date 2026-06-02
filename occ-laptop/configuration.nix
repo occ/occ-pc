@@ -10,6 +10,7 @@
   imports = [
     ./hardware-configuration.nix
     ../shared/common.nix
+    inputs.nix-amd-ai.nixosModules.default
   ];
 
   # Linux 6.19 is EOL and removed from nixpkgs (2026-04-23). Pinned 26.05's
