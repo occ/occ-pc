@@ -32,7 +32,6 @@
       self,
       nixpkgs,
       nixpkgs-unstable,
-      nix-amd-ai,
       nixos-hardware,
       # android-nixpkgs,
       home-manager,
