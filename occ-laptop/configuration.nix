@@ -135,6 +135,15 @@
     # llama-cpp-vulkan ahead of the CPU build on PATH, so llama-server and
     # lemonade's llama.cpp backend run on the iGPU instead of CPU/BLAS.
     enableVulkan = true;
+    # ROCm kept as a fallback and for HIP ecosystem tooling (rocminfo,
+    # profilers, HIP apps). gfx1150 is targeted natively, so no
+    # HSA_OVERRIDE_GFX_VERSION needed. Note: llama-cpp-rocm is declared
+    # before llama-cpp-vulkan in the module's systemPackages, so the bare
+    # `llama-server` on PATH resolves to the ROCm build; lemonade still
+    # routes per-backend via its *_ROCM_BIN / *_VULKAN_BIN env hooks.
+    # Per nix-amd-ai's own gfx1150 benchmarks, Vulkan beats ROCm for
+    # decode/prefill, so inference still prefers Vulkan.
+    enableROCm = true;
     lemonade.user = "occ";
   };
 
