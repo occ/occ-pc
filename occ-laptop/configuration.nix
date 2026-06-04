@@ -26,6 +26,24 @@
   nixpkgs.overlays = [
     (final: prev: {
       virtualbox = pkgs-unstable.virtualbox;
+
+      # Intel AX210 firmware ty-a0-gf-a0-89.ucode regressed suspend/resume: on
+      # wake it SYSASSERTs ("Failed to start RT ucode: -110"), leaving WiFi dead,
+      # wedging NetworkManager in uninterruptible sleep so the box can't
+      # re-suspend, and taking Bluetooth down with it (same AX210 combo chip).
+      # The crash is intermittent but recurring (seen on multiple resumes).
+      # -89 is the newest firmware linux-firmware ships -- there is no -87/-88,
+      # and nothing newer to update *to* -- so the fix is to drop -89 and let
+      # iwlwifi fall back to the previous good release, -86 (the driver loads the
+      # highest API-version file present). Remove this override once a fixed
+      # ty-a0-gf-a0-90+ lands upstream. Symptom in journal: ADVANCED_SYSASSERT.
+      linux-firmware = prev.linux-firmware.overrideAttrs (old: {
+        postInstall = (old.postInstall or "") + ''
+          rm -f \
+            "$out/lib/firmware/iwlwifi-ty-a0-gf-a0-89.ucode" \
+            "$out/lib/firmware/intel/iwlwifi/iwlwifi-ty-a0-gf-a0-89.ucode"
+        '';
+      });
     })
   ];
 
