@@ -26,24 +26,6 @@
   nixpkgs.overlays = [
     (final: prev: {
       virtualbox = pkgs-unstable.virtualbox;
-
-      # Intel AX210 firmware ty-a0-gf-a0-89.ucode regressed suspend/resume: on
-      # wake it SYSASSERTs ("Failed to start RT ucode: -110"), leaving WiFi dead,
-      # wedging NetworkManager in uninterruptible sleep so the box can't
-      # re-suspend, and taking Bluetooth down with it (same AX210 combo chip).
-      # The crash is intermittent but recurring (seen on multiple resumes).
-      # -89 is the newest firmware linux-firmware ships -- there is no -87/-88,
-      # and nothing newer to update *to* -- so the fix is to drop -89 and let
-      # iwlwifi fall back to the previous good release, -86 (the driver loads the
-      # highest API-version file present). Remove this override once a fixed
-      # ty-a0-gf-a0-90+ lands upstream. Symptom in journal: ADVANCED_SYSASSERT.
-      linux-firmware = prev.linux-firmware.overrideAttrs (old: {
-        postInstall = (old.postInstall or "") + ''
-          rm -f \
-            "$out/lib/firmware/iwlwifi-ty-a0-gf-a0-89.ucode" \
-            "$out/lib/firmware/intel/iwlwifi/iwlwifi-ty-a0-gf-a0-89.ucode"
-        '';
-      });
     })
   ];
 
@@ -53,6 +35,27 @@
   networking.networkmanager.plugins = with pkgs; [
     networkmanager-openvpn
   ];
+
+  # --- AX210 (iwlwifi) suspend/resume workaround --------------------------
+  # The AX210 firmware ty-a0-gf-a0-89.ucode intermittently SYSASSERTs across
+  # s2idle suspend/resume ("Failed to start RT ucode: -110"): on wake WiFi is
+  # dead, NetworkManager wedges in uninterruptible sleep so the box can't
+  # re-suspend, and Bluetooth (same AX210 combo chip) drops with it -- only a
+  # reboot recovers. Firmware can't fix this: kernel 7.0's iwlwifi hard-requires
+  # exactly -89 (it won't fall back to an older file -- verified: removing -89
+  # left "no suitable firmware found"), and -89 is already the newest build.
+  # So instead reload the driver around sleep: tear it down before suspend and
+  # bring it back on resume, so the firmware re-inits from scratch instead of
+  # resuming into a wedged state. iwlmvm depends on iwlwifi (unload mvm first);
+  # the reload re-creates the netdev and NetworkManager reconnects. `|| true`
+  # on unload so a busy module never blocks suspend. Drop this once a fixed
+  # firmware/kernel lands. Symptom in journal: iwlwifi ADVANCED_SYSASSERT.
+  powerManagement.powerDownCommands = ''
+    ${pkgs.kmod}/bin/modprobe -r iwlmvm iwlwifi || true
+  '';
+  powerManagement.resumeCommands = ''
+    ${pkgs.kmod}/bin/modprobe iwlmvm iwlwifi
+  '';
 
   security.tpm2.enable = true;
 
