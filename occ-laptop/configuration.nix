@@ -46,15 +46,23 @@
   # left "no suitable firmware found"), and -89 is already the newest build.
   # So instead reload the driver around sleep: tear it down before suspend and
   # bring it back on resume, so the firmware re-inits from scratch instead of
-  # resuming into a wedged state. iwlmvm depends on iwlwifi (unload mvm first);
-  # the reload re-creates the netdev and NetworkManager reconnects. `|| true`
-  # on unload so a busy module never blocks suspend. Drop this once a fixed
-  # firmware/kernel lands. Symptom in journal: iwlwifi ADVANCED_SYSASSERT.
+  # resuming into a wedged state. The reload re-probes the PCI device, which
+  # re-creates the netdev (NetworkManager reconnects) and reloads BT-shared
+  # state cleanly. `|| true` on unload so a hiccup never blocks suspend. Drop
+  # this once a fixed firmware/kernel lands. Symptom in journal: ADVANCED_SYSASSERT.
+  #
+  # NB: unload with a SINGLE arg (iwlwifi). NixOS ships a custom modprobe
+  # `remove iwlwifi` command that already tears down the whole stack
+  # (rmmod iwlmvm+iwlwifi, then `modprobe -r mac80211`). Passing `iwlmvm iwlwifi`
+  # fires that command twice -- the second run hits an empty stack, so its
+  # `xargs rmmod` runs with no module name, errors, and aborts the *entire*
+  # unload (verified: modules stayed loaded). `modprobe -r iwlwifi` alone is the
+  # correct invocation; `modprobe iwlwifi` on resume pulls iwlmvm + mac80211.
   powerManagement.powerDownCommands = ''
-    ${pkgs.kmod}/bin/modprobe -r iwlmvm iwlwifi || true
+    ${pkgs.kmod}/bin/modprobe -r iwlwifi || true
   '';
   powerManagement.resumeCommands = ''
-    ${pkgs.kmod}/bin/modprobe iwlmvm iwlwifi
+    ${pkgs.kmod}/bin/modprobe iwlwifi
   '';
 
   security.tpm2.enable = true;
