@@ -21,7 +21,6 @@ in
     ./apps/gnome-theme
     ./apps/lens
     ./apps/neovim
-    ./apps/rust-rover
     ./apps/starship
     ./apps/vscode
     ./settings/espresso-display.nix
