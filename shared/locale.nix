@@ -28,8 +28,14 @@
     submitData = false;
   };
 
-  sops.templates."geoclue.conf".content =
-    config.environment.etc."geoclue/geoclue.conf".text;
+  # geoclue runs as the unprivileged "geoclue" user, so the rendered config
+  # (which carries the Google geolocation url) must be readable by it. The sops
+  # default of root-only 0400 left geoclue unable to read its own config, so it
+  # dropped the wifi/3G source and produced no location fix.
+  sops.templates."geoclue.conf" = {
+    content = config.environment.etc."geoclue/geoclue.conf".text;
+    owner = "geoclue";
+  };
 
   environment.etc."geoclue/geoclue.conf".source =
     lib.mkForce config.sops.templates."geoclue.conf".path;
