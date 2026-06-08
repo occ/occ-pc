@@ -31,9 +31,10 @@
 
   networking.hostName = "occ-laptop";
   networking.networkmanager.enable = true;
-  # WireGuard support is built into NetworkManager; only OpenVPN needs a plugin.
+  # WireGuard support is built into NetworkManager; OpenVPN and Cisco AnyConnect need plugins.
   networking.networkmanager.plugins = with pkgs; [
     networkmanager-openvpn
+    networkmanager-openconnect
   ];
 
   # --- AX210 (iwlwifi) suspend/resume workaround --------------------------
@@ -174,6 +175,7 @@
   environment.systemPackages = with pkgs; [
     clevis
     ddcutil
+    openconnect
     # intel-gpu-tools
     libva-utils
   ];
