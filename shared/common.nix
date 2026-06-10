@@ -11,6 +11,7 @@
   sops.secrets.nix_cache_priv_key.sopsFile = ./common.sops.yaml;
 
   imports = [
+    ./azin-vpn.nix
     ./boot.nix
     ./epson-et-3950.nix
     ./fonts.nix

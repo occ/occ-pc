@@ -1,5 +1,6 @@
 {
   config,
+  pkgs,
   ...
 }:
 {
@@ -10,6 +11,14 @@
   ];
 
   networking.hostName = "occ-desktop";
+
+  # Required by shared/azin-vpn.nix (the AzinTelecom GlobalProtect VPN runs over
+  # NetworkManager). This switches the desktop from scripted DHCP to NM-managed
+  # networking -- rebuild with console access, not over SSH, the first time.
+  networking.networkmanager.enable = true;
+  networking.networkmanager.plugins = with pkgs; [
+    networkmanager-openconnect
+  ];
 
   # NVIDIA support
   # Load nvidia driver for Xorg and Wayland

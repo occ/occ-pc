@@ -31,7 +31,7 @@
 
   networking.hostName = "occ-laptop";
   networking.networkmanager.enable = true;
-  # WireGuard support is built into NetworkManager; OpenVPN and Cisco AnyConnect need plugins.
+  # WireGuard support is built into NetworkManager; OpenVPN and OpenConnect protocols need plugins.
   networking.networkmanager.plugins = with pkgs; [
     networkmanager-openvpn
     networkmanager-openconnect
@@ -176,6 +176,7 @@
     clevis
     ddcutil
     openconnect
+    gpclient
     # intel-gpu-tools
     libva-utils
   ];
