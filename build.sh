@@ -73,7 +73,7 @@ preflight_sops
 echo "*** System ***"
 # `switch` (not `boot`): activate now so any failure surfaces while we're
 # still logged in, instead of being deferred to a boot we can't recover from.
-sudo nixos-rebuild switch --flake "$SCRIPT_DIR"
+sudo nixos-rebuild boot --flake "$SCRIPT_DIR"
 
 echo
 echo "*** Home ***"
