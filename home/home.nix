@@ -16,6 +16,7 @@ in
   ];
   imports = [
     ./apps/claude-code
+    ./apps/claude-desktop
     ./apps/ghostty
     ./apps/gnome
     ./apps/gnome-theme
