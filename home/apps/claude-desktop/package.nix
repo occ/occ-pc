@@ -30,6 +30,15 @@
   libpulseaudio,
   libsecret,
   libuuid,
+  libx11,
+  libxcb,
+  libxcomposite,
+  libxdamage,
+  libxext,
+  libxfixes,
+  libxrandr,
+  libxshmfence,
+  libxtst,
   libxkbcommon,
   nspr,
   nss,
@@ -38,7 +47,6 @@
   vulkan-loader,
   wayland,
   xdg-utils,
-  xorg,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -83,15 +91,15 @@ stdenv.mkDerivation (finalAttrs: {
     nss
     pango
     (lib.getLib systemd)
-    xorg.libX11
-    xorg.libXcomposite
-    xorg.libXdamage
-    xorg.libXext
-    xorg.libXfixes
-    xorg.libXrandr
-    xorg.libXtst
-    xorg.libxcb
-    xorg.libxshmfence
+    libx11
+    libxcb
+    libxcomposite
+    libxdamage
+    libxext
+    libxfixes
+    libxrandr
+    libxshmfence
+    libxtst
     stdenv.cc.cc.lib
   ];
 
