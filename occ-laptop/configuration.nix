@@ -13,14 +13,12 @@
     inputs.nix-amd-ai.nixosModules.default
   ];
 
-  # Linux 6.19 is EOL and removed from nixpkgs (2026-04-23). Pinned 26.05's
-  # linuxPackages_7_0 has a broken zfs_unstable (2.4.0) and only an older
-  # virtualbox module, so take the kernel set from unstable: it ships
-  # zfs_unstable 2.4.2 (7.0-compatible) and virtualbox-modules 7.2.8.
-  boot.kernelPackages = pkgs-unstable.linuxPackages_7_0;
+  # Linux 7.0 reached EOL (2026-07) and was removed from nixpkgs.
+  # Take the kernel set from unstable: linux 7.1 with zfs_unstable 2.4.3.
+  boot.kernelPackages = pkgs-unstable.linuxPackages_7_1;
 
   # Default boot.zfs.package is stable zfs (2.3.x) which caps at 6.19.
-  # Match the kernel's zfs_unstable 2.4.2 (NixOS asserts version equality).
+  # Match the kernel's zfs_unstable 2.4.3 (NixOS asserts version equality).
   boot.zfs.package = pkgs-unstable.zfs_unstable;
   # --- Strix Halo GPU memory aperture ------------------------------------
   # ds4 (DwarfStar) needs the full unified memory visible to the GPU.
