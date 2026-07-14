@@ -22,6 +22,18 @@
   # Default boot.zfs.package is stable zfs (2.3.x) which caps at 6.19.
   # Match the kernel's zfs_unstable 2.4.2 (NixOS asserts version equality).
   boot.zfs.package = pkgs-unstable.zfs_unstable;
+  # --- Strix Halo GPU memory aperture ------------------------------------
+  # ds4 (DwarfStar) needs the full unified memory visible to the GPU.
+  # Without these params, rocminfo shows only ~47 GB GPU-visible.
+  # Scaled for 94 GiB system: 90 GiB GTT, ~92 GiB TTM page limit.
+  # BIOS must also set UMA Frame Buffer Size to minimum (512 MB / 2 GB).
+  # See docs/dwarfstar4.md for details.
+  boot.kernelParams = [
+    "iommu=pt"
+    "amdgpu.gttsize=92160"
+    "ttm.pages_limit=24117248"
+    "ttm.page_pool_size=24117248"
+  ];
 
   nixpkgs.overlays = [
     (final: prev: {
