@@ -70,16 +70,15 @@ in
   # Match the kernel with zfs_unstable 2.4.3 (NixOS asserts version equality).
   # The flake overlay patches META to accept kernel 7.1.
   boot.zfs.package = pkgs-unstable.zfs_unstable;
-  # ds4 (DwarfStar) needs the full unified memory visible to the GPU.
-  # Without these params, rocminfo shows only ~47 GB GPU-visible.
-  # Scaled for 94 GiB system: 90 GiB GTT, ~92 GiB TTM page limit.
-  # BIOS must also set UMA Frame Buffer Size to minimum (512 MB / 2 GB).
-  # See docs/dwarfstar4.md for details.
+  # ds4 (DwarfStar) — expand GTT beyond 112 GiB to cross ds4's internal
+  # threshold (>= 112 GiB: reserve drops from 5% to 512 MiB). This frees
+  # ~4 GiB for graph buffers, potentially avoiding SSD streaming.
+  # Scaled for 125 GiB system: 112 GiB GTT, ~112 GiB TTM page limit.
   boot.kernelParams = [
     "iommu=pt"
-    "amdgpu.gttsize=92160"
-    "ttm.pages_limit=24117248"
-    "ttm.page_pool_size=24117248"
+    "amdgpu.gttsize=114688"
+    "ttm.pages_limit=29360128"
+    "ttm.page_pool_size=29360128"
   ];
 
   nixpkgs.overlays = [
