@@ -14,7 +14,7 @@ let
       owner = "antirez";
       repo = "ds4";
       rev = "80ebbc396aee40eedc1d829222f3362d10fa4c6c";
-      hash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
+      hash = "sha256-Ieuc72GHZs20ModQfnvI5Me31n4Pj+WFYtsuqaKJceo=";
     };
 
     nativeBuildInputs = with pkgs-unstable.rocmPackages; [
