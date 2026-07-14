@@ -20,6 +20,9 @@
   # Default boot.zfs.package is stable zfs (2.3.x) which caps at 6.19.
   # Match the kernel's zfs_unstable 2.4.3 (NixOS asserts version equality).
   boot.zfs.package = pkgs-unstable.zfs_unstable;
+  # zfs_unstable 2.4.3 is marked broken with kernel 7.1 upstream
+  # (conservative — it's the intended kernel pairing). Override.
+  nixpkgs.config.problems.handlers.zfs.broken = "warn";
   # --- Strix Halo GPU memory aperture ------------------------------------
   # ds4 (DwarfStar) needs the full unified memory visible to the GPU.
   # Without these params, rocminfo shows only ~47 GB GPU-visible.
