@@ -10,7 +10,12 @@ let
   ds4 = pkgs-unstable.stdenv.mkDerivation {
     pname = "ds4";
     version = "unstable-2026-07-14";
-    src = pkgs-unstable.lib.cleanSource /home/occ/Projects/ds4;
+    src = pkgs-unstable.fetchFromGitHub {
+      owner = "antirez";
+      repo = "ds4";
+      rev = "80ebbc396aee40eedc1d829222f3362d10fa4c6c";
+      hash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
+    };
 
     nativeBuildInputs = with pkgs-unstable.rocmPackages; [
       llvm.clang clr hipblas hipblas-common hipblaslt hipcub rocblas rocprim rocwmma
