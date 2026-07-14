@@ -13,17 +13,14 @@
     inputs.nix-amd-ai.nixosModules.default
   ];
 
-  # Linux 7.0 reached EOL (2026-07) and was removed from nixpkgs.
-  # Take the kernel set from unstable: linux 7.1 with zfs_unstable 2.4.3.
+  # Linux 7.1 + ZFS 2.4.3: ZFS META caps at 7.0 but the code already
+  # has 7.1 support (see flake overlay patching Linux-Maximum to 7.1).
   boot.kernelPackages = pkgs-unstable.linuxPackages_7_1;
 
   # Default boot.zfs.package is stable zfs (2.3.x) which caps at 6.19.
-  # Match the kernel's zfs_unstable 2.4.3 (NixOS asserts version equality).
+  # Match the kernel with zfs_unstable 2.4.3 (NixOS asserts version equality).
+  # The flake overlay patches META to accept kernel 7.1.
   boot.zfs.package = pkgs-unstable.zfs_unstable;
-  # zfs_unstable 2.4.3 is marked broken with kernel 7.1 upstream
-  # (conservative — it's the intended kernel pairing). Override.
-  nixpkgs.config.problems.handlers.zfs.broken = "warn";
-  # --- Strix Halo GPU memory aperture ------------------------------------
   # ds4 (DwarfStar) needs the full unified memory visible to the GPU.
   # Without these params, rocminfo shows only ~47 GB GPU-visible.
   # Scaled for 94 GiB system: 90 GiB GTT, ~92 GiB TTM page limit.

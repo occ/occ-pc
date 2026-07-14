@@ -2,7 +2,6 @@
   description = "occ-laptop";
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-26.05";
-    nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
     nix-amd-ai.url = "github:noamsto/nix-amd-ai";
     nixos-hardware.url = "github:NixOS/nixos-hardware";
 
@@ -51,7 +50,17 @@
         inherit system;
         config = {
           allowUnfree = true;
+          problems.handlers.zfs.broken = "warn";
         };
+        overlays = [
+          (final: prev: {
+            zfs_unstable = prev.zfs_unstable.overrideAttrs (old: {
+              postPatch = (old.postPatch or "") + ''
+                substituteInPlace META --replace-fail 'Linux-Maximum: 7.0' 'Linux-Maximum: 7.1'
+              '';
+            });
+          })
+        ];
       };
     in
     {
