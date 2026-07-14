@@ -54,10 +54,15 @@
         };
         overlays = [
           (final: prev: {
-            zfs_unstable = prev.zfs_unstable.overrideAttrs (old: {
-              postPatch = (old.postPatch or "") + ''
-                substituteInPlace META --replace-fail 'Linux-Maximum: 7.0' 'Linux-Maximum: 7.1'
-              '';
+            # Patch ZFS to accept kernel 7.1. The userspace package's postPatch
+            # doesn't reach the kernel module derivation, so override the kernel
+            # package set's zfs_unstable directly.
+            linuxPackages_7_1 = prev.linuxPackages_7_1.extend (kfinal: kprev: {
+              zfs_unstable = kprev.zfs_unstable.overrideAttrs (old: {
+                postPatch = (old.postPatch or "") + ''
+                  substituteInPlace META --replace-fail 'Linux-Maximum: 7.0' 'Linux-Maximum: 7.1'
+                '';
+              });
             });
           })
         ];
