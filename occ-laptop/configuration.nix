@@ -4,6 +4,7 @@
   pkgs,
   pkgs-unstable,
   inputs,
+  ds4,
   ...
 }:
 {
@@ -185,6 +186,7 @@
   environment.systemPackages = with pkgs; [
     clevis
     ddcutil
+    ds4
     openconnect
     gpclient
     # intel-gpu-tools

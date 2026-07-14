@@ -174,41 +174,66 @@ cp -a /tmp/rocWMMA/library/include/rocwmma /path/to/include/
 
 Then set `CPATH` or `C_INCLUDE_PATH` so `hipcc` finds them.
 
-## Verification Steps
+## Working Configuration
 
-After all blockers are resolved:
+### Build
 
-1. **Clone and build:**
-   ```sh
-   git clone https://github.com/antirez/ds4
-   cd ds4
-   make strix-halo -j$(nproc)
-   ```
+```sh
+cd ~/Projects/ds4
+nix-shell shell.nix --run 'make strix-halo -j$(nproc) ROCM_ARCH=gfx1150'
+```
 
-2. **Download the model:**
-   ```sh
-   ./download_model.sh q2-imatrix
-   ```
-   (Set `DS4_GGUF_DIR` first if using external storage.)
+The Radeon 890M reports as `gfx1150`. The Makefile defaults to `gfx1151`
+(for 8060S). Override `ROCM_ARCH` explicitly.
 
-3. **Smoke test:**
-   ```sh
-   ./ds4 -p "Hello, who are you?" -n 128
-   ```
+### Run
 
-4. **Performance expectation** (from STRIXHALO.md benchmarks — M3 Max 128 GB as rough analog):
-   - Prefill: ~50-90 t/s (short prompt)
-   - Generation: ~20-35 t/s
+```sh
+nix-shell shell.nix --run './ds4 --ssd-streaming --nothink -p "Hello" -n 64'
+```
+
+**SSD streaming is required.** Without it, the full model (80.76 GiB) plus
+runtime buffers exceeds the 98.78 GiB GPU-visible memory (`hipMemGetInfo`).
+SSD streaming keeps only hot experts in GPU memory, dropping residency from
+80.76 GiB to ~74 GiB working set.
+
+### Actual Performance (Radeon 890M, 16 CUs)
+
+| Mode | Prefill | Generation |
+|------|---------|------------|
+| SSD streaming, ctx=32768, short prompt | 1.8 t/s | 3.7 t/s |
+
+These are much lower than the STRIXHALO.md benchmarks (Strix Halo 8060S has
+40 CUs vs the 890M's 16 CUs). The 890M is a Strix Point mobile GPU — expect
+~5-8x slower than a full Strix Halo desktop part.
+
+### Memory Layout
+
+| Pool | Size | Notes |
+|------|------|-------|
+| System RAM | 125 GiB | After BIOS UMA → minimum |
+| HSA Pool 1 (rocminfo) | 125 GiB | Fine-grained, CPU+GPU |
+| GPU-visible (hipMemGetInfo) | 98.78 GiB | Limited by `amdgpu.gttsize=92160` |
+| ds4 working set (SSD streaming) | 73.60 GiB | 80% of GPU-visible, cached experts only |
+| Model weights (total) | 80.76 GiB | IQ2XXS quant |
+| Context buffers (ctx=32768) | 1.05 GiB | Raw + compressed KV |
 
 ## Risk Notes
 
-- **RAM headroom is tight.** 94 GiB total, model ~81 GiB weights, OS + buffers ~5-8 GiB, KV cache variable. At long context lengths (32K+), the KV cache may push into swap or trigger OOM. SSD streaming (`--ssd` flag) can help offload KV cache to disk.
-- **gfx1150 vs gfx1151.** The ds4 Makefile targets `gfx1151` (Radeon 8060S in Framework Desktop). Your GPU reports as gfx1150 (890M). These are the same ISA family — ROCm `--offload-arch=gfx1151` binaries should work on gfx1150, but it's worth verifying. If not, changing `ROCM_ARCH ?= gfx1151` to `gfx1150` in the Makefile may be needed.
-- **Beta quality.** ds4 is days/weeks old. The author calls it beta. Expect rough edges.
-- **Kernel crash risk.** The README warns that macOS CPU path crashes the kernel on current macOS versions. This is irrelevant on Linux/ROCm, but worth knowing the codebase is young.
+- **SSD streaming required.** Full model residency OOMs even with GTT expanded
+  to 92 GiB. The 890M's 16 CUs also mean generation speed is ~3-4 t/s — usable
+  but slow for interactive chat.
+- **gfx1150 required.** Must build with `ROCM_ARCH=gfx1150`. gfx1151 binaries
+  (default) segfault on the 890M.
+- **Beta quality.** ds4 is weeks old. Expect rough edges.
+- **ZFS + kernel 7.1.** The flake overlay patches ZFS 2.4.3's META file
+  (`Linux-Maximum: 7.0` → `7.1`) and overrides the `broken` meta flag.
+  ZFS 2.4.3 already includes 7.1 kernel fixes — the version cap is stale.
 
-- [STRIXHALO.md](https://github.com/antirez/ds4/blob/main/STRIXHALO.md) — official Strix Halo setup guide
-- [ds4 issue #459](https://github.com/antirez/ds4/issues/459) — BIOS UMA reservation vs. usable context (counter-intuitive)
-- [Strix Halo Host System Configuration](https://deepwiki.com/kyuz0/amd-strix-halo-toolboxes/6.3-host-system-configuration) — community kernel param and BIOS reference
-- [download_model.sh](https://github.com/antirez/ds4/blob/main/download_model.sh) — model download script
-- Model repo: `https://huggingface.co/antirez/deepseek-v4-gguf`
+## References
+
+- [STRIXHALO.md](https://github.com/antirez/ds4/blob/main/STRIXHALO.md)
+- [ds4 issue #459](https://github.com/antirez/ds4/issues/459) — BIOS UMA vs context
+- [Strix Halo Host System Configuration](https://deepwiki.com/kyuz0/amd-strix-halo-toolboxes/6.3-host-system-configuration)
+- `flake.nix` — ZFS overlay for kernel 7.1
+- `docs/dwarfstar4.md` — this document

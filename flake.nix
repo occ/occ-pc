@@ -67,6 +67,61 @@
           })
         ];
       };
+      ds4 = pkgs-unstable.stdenv.mkDerivation {
+        pname = "ds4";
+        version = "unstable-2026-07-14";
+        src = pkgs-unstable.lib.cleanSource /home/occ/Projects/ds4;
+
+        nativeBuildInputs = with pkgs-unstable; [
+          rocmPackages.llvm.clang
+          rocmPackages.clr
+          rocmPackages.hipblas
+          rocmPackages.hipblas-common
+          rocmPackages.hipblaslt
+          rocmPackages.hipcub
+          rocmPackages.rocblas
+          rocmPackages.rocprim
+          rocmPackages.rocwmma
+          gnumake
+        ];
+
+        buildInputs = with pkgs-unstable; [
+          rocmPackages.hipblas
+          rocmPackages.hipblaslt
+          rocmPackages.rocblas
+        ];
+
+        preBuild = ''
+          export HIP_CLANG_PATH="${pkgs-unstable.rocmPackages.llvm.clang}/bin"
+        '';
+
+        buildPhase = ''
+          runHook preBuild
+          make strix-halo -j$NIX_BUILD_CORES ROCM_ARCH=gfx1150
+          runHook postBuild
+        '';
+
+        installPhase = ''
+          runHook preInstall
+          mkdir -p $out/bin
+          cp ds4 ds4-server ds4-bench ds4-eval ds4-agent $out/bin/
+          runHook postInstall
+        '';
+
+        # Point hipcc at the right include/libs
+        CPATH = with pkgs-unstable.rocmPackages; pkgs-unstable.lib.makeSearchPath "include" [
+          hipblas hipblas-common hipblaslt hipcub rocblas rocprim rocwmma
+        ];
+        LIBRARY_PATH = with pkgs-unstable.rocmPackages; pkgs-unstable.lib.makeLibraryPath [
+          hipblas hipblaslt rocblas
+        ];
+
+        meta = with pkgs-unstable.lib; {
+          description = "DeepSeek V4 Flash/PRO local inference engine";
+          license = licenses.mit;
+          platforms = platforms.linux;
+        };
+      };
     in
     {
       homeConfigurations."occ" = home-manager.lib.homeManagerConfiguration {
@@ -99,12 +154,12 @@
         };
 
         occ-laptop = nixpkgs.lib.nixosSystem {
-          system = "x86_64-linux";
           specialArgs = {
             inherit
               system
               inputs
               pkgs-unstable
+              ds4
               # android-nixpkgs
               nixos-hardware
               ;
