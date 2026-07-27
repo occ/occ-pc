@@ -172,6 +172,7 @@ in
   };
 
   environment.systemPackages = with pkgs; [
+    amd-debug-tools
     clevis
     ddcutil
     ds4
