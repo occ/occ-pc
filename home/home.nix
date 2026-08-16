@@ -21,7 +21,6 @@ in
     ./apps/gnome
     ./apps/gnome-theme
     ./apps/lens
-    ./apps/neovim
     ./apps/starship
     ./apps/vscode
     ./settings/espresso-display.nix
@@ -93,7 +92,6 @@ in
   home.shellAliases = {
     "libation_sync" =
       "rsync -avz --info=progress2 -e \"ssh\" --rsync-path=\"sudo rsync\" ~/Libation/Books/ occ-nas:/vol0/pvc-a1ec8d5a-a6ff-4b0a-8f9a-1d327fbdb42b/";
-    "vim" = "nvim";
   };
 
   home.stateVersion = "26.05";
