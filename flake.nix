@@ -39,18 +39,22 @@
         inherit system;
         config = {
           allowUnfree = true;
-          problems.handlers.zfs.broken = "warn";
         };
         overlays = [
           (final: prev: {
-            # Patch ZFS to accept kernel 7.1. The userspace package's postPatch
-            # doesn't reach the kernel module derivation, so override the kernel
-            # package set's zfs_unstable directly.
-            linuxPackages_7_1 = prev.linuxPackages_7_1.extend (kfinal: kprev: {
+            # Patch ZFS to accept the latest kernel (7.1). The userspace
+            # package's postPatch doesn't reach the kernel module derivation,
+            # so override the kernel package set's zfs_unstable directly.
+            linuxPackages_latest = prev.linuxPackages_latest.extend (kfinal: kprev: {
               zfs_unstable = kprev.zfs_unstable.overrideAttrs (old: {
                 postPatch = (old.postPatch or "") + ''
                   substituteInPlace META --replace-fail 'Linux-Maximum: 7.0' 'Linux-Maximum: 7.1'
                 '';
+                # nixpkgs still caps zfs_unstable at kernel 7.0 and marks the
+                # module `broken` for 7.1. ZFS 2.4.3 already ships the 7.1
+                # fixes (the cap is stale), so clear the flag here instead of
+                # masking it globally via config.problems.handlers.
+                meta = (old.meta or { }) // { broken = false; };
               });
             });
           })

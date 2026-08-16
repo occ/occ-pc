@@ -62,14 +62,18 @@ in
     inputs.nix-amd-ai.nixosModules.default
   ];
 
-  # Linux 7.1 + ZFS 2.4.3: ZFS META caps at 7.0 but the code already
-  # has 7.1 support (see flake overlay patching Linux-Maximum to 7.1).
-  boot.kernelPackages = pkgs-unstable.linuxPackages_7_1;
+  # Track nixpkgs-unstable's latest kernel (currently 7.1) + ZFS 2.4.3:
+  # ZFS META caps at 7.0 but the code already has 7.1 support (see the
+  # flake overlay patching Linux-Maximum to 7.1).
+  boot.kernelPackages = pkgs-unstable.linuxPackages_latest;
 
   # Default boot.zfs.package is stable zfs (2.3.x) which caps at 6.19.
   # Match the kernel with zfs_unstable 2.4.3 (NixOS asserts version equality).
   # The flake overlay patches META to accept kernel 7.1.
   boot.zfs.package = pkgs-unstable.zfs_unstable;
+  # 26.11 default: refuse to force-import the root pool to avoid data loss
+  # if it is in use by another system (e.g. after an unclean shutdown).
+  boot.zfs.forceImportRoot = false;
   # ds4 (DwarfStar) — expand GTT beyond 112 GiB to cross ds4's internal
   # threshold (>= 112 GiB: reserve drops from 5% to 512 MiB). This frees
   # ~4 GiB for graph buffers, potentially avoiding SSD streaming.
