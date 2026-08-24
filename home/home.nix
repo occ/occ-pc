@@ -55,7 +55,6 @@ in
   home.homeDirectory = "/home/occ";
   home.username = "occ";
   home.packages = with pkgs; [
-    pkgs-unstable.antigravity-ide-fhs
     appimage-run
     pkgs-unstable.aptakube
     dig
