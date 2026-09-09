@@ -101,6 +101,7 @@ in
       enableBashIntegration = true;
       nix-direnv.enable = true;
       silent = true;
+      config.whitelist.prefix = [ "/home/occ/Projects/FleetDriver/fleetdriver/" ];
     };
 
     git = {
