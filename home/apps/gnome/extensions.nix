@@ -14,6 +14,7 @@
     clipboard-history
     desktop-cube
     hide-top-bar
+    just-perfection
     notification-banner-reloaded
     proton-vpn-button
     tray-icons-reloaded
@@ -38,6 +39,7 @@
         "clipboard-history@alexsaveau.dev"
         "notification-banner-reloaded@marcinjakubowski.github.com"
         "adaptive-brightness@dmy3k.github.io"
+        "just-perfection-desktop@just-perfection"
       ];
     };
 
