@@ -96,6 +96,17 @@ in
   home.stateVersion = "26.05";
 
   programs = {
+    # OMP loads audio backends dynamically, outside nix-ld's library path.
+    fish.functions.omp = ''
+      set -lx LD_LIBRARY_PATH ${
+        pkgs.lib.makeLibraryPath [
+          pkgs.libpulseaudio
+          pkgs.alsa-lib
+        ]
+      } $LD_LIBRARY_PATH
+      command omp $argv
+    '';
+
     direnv = {
       enable = true;
       enableBashIntegration = true;
