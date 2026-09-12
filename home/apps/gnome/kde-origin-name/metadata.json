@@ -1,0 +1,7 @@
+{
+  "uuid": "kde-origin-name@occ.me",
+  "name": "Advertise x-kde-origin-name",
+  "description": "Adds x-kde-origin-name to the org.freedesktop.Notifications capabilities so Chrome puts the site origin in a hint instead of the notification body.",
+  "shell-version": ["50", "51"],
+  "version": 1
+}
