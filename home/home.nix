@@ -15,6 +15,7 @@ in
     # android-nixpkgs.overlays.default
   ];
   imports = [
+    ./apps/browser-router
     ./apps/claude-code
     ./apps/claude-desktop
     ./apps/ghostty
@@ -96,6 +97,25 @@ in
   home.stateVersion = "26.05";
 
   programs = {
+    # Work links open in the fleetdriver.com Chrome profile, the rest in Firefox.
+    browser-router = {
+      enable = true;
+      default = "${pkgs.firefox}/bin/firefox";
+      rules = [
+        {
+          hosts = [
+            "fd.dev"
+            "*.fd.dev"
+            "fleetdriver.*"
+            "*.fleetdriver.*"
+          ];
+          # Chrome wants the profile directory, not its display name; the
+          # mapping is `profile.info_cache` in ~/.config/google-chrome/Local State.
+          browser = ''${pkgs.google-chrome}/bin/google-chrome-stable --profile-directory="Profile 7"'';
+        }
+      ];
+    };
+
     # OMP loads audio backends dynamically, outside nix-ld's library path.
     fish.functions.omp = ''
       set -lx LD_LIBRARY_PATH ${
