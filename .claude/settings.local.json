@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(lscpu:*)",
+      "Bash(vulkaninfo:*)",
+      "Bash(rocminfo:*)",
+      "Bash(lspci:*)",
+      "Bash(lsmod:*)",
+      "Bash(nix --extra-experimental-features 'nix-command flakes' eval --impure --expr 'let pkgs = \\(builtins.getFlake \"/home/occ/Projects/occ/occ-pc\"\\).inputs.nixpkgs.legacyPackages.x86_64-linux; in { latest = pkgs.linuxPackages_latest.kernel.version; zfs_compat = pkgs.zfs.meta.broken or false; zfs_kernel_max = pkgs.zfs.latestCompatibleLinuxPackages.kernel.version or \"unknown\"; }')",
+      "Bash(nix --extra-experimental-features 'nix-command flakes' eval --impure --expr 'let pkgs = \\(builtins.getFlake \"/home/occ/Projects/occ/occ-pc\"\\).inputs.nixpkgs.legacyPackages.x86_64-linux; mk = v: let kp = pkgs.\"linuxPackages_${v}\" or null; in if kp == null then \"missing\" else { kver = kp.kernel.version or \"?\"; zfsBroken = \\(kp.zfs.meta.broken or false\\); zfsKver = kp.zfs.kernelCompatible or \"?\"; }; in { k7_0 = mk \"7_0\"; k6_18 = mk \"6_18\"; k6_17 = mk \"6_17\"; k6_16 = mk \"6_16\"; k6_15 = mk \"6_15\"; k6_14 = mk \"6_14\"; k6_12 = mk \"6_12\"; }')",
+      "Bash(nix --extra-experimental-features 'nix-command flakes' eval --impure --expr 'let pkgs = \\(builtins.getFlake \"/home/occ/Projects/occ/occ-pc\"\\).inputs.nixpkgs.legacyPackages.x86_64-linux; mk = v: let kp = pkgs.\"linuxPackages_${v}\" or null; attr = pkgs.zfs.kernelModuleAttribute or \"zfs\"; zfsM = kp.${attr} or null; in if kp == null then \"missing\" else { kver = kp.kernel.version; zfsAttr = attr; zfsBroken = if zfsM == null then \"no-attr\" else \\(zfsM.meta.broken or false\\); zfsKernelMax = if zfsM == null then \"-\" else \\(zfsM.kernelCompatible or \"-\"\\); }; in { k7_0 = mk \"7_0\"; k6_18 = mk \"6_18\"; k6_12 = mk \"6_12\"; }')",
+      "Bash(nix --extra-experimental-features 'nix-command flakes' eval '.#nixosConfigurations.\"occ-laptop\".config.system.build.toplevel.drvPath')",
+      "Bash(gh api *)",
+      "Bash(gh search *)",
+      "Bash(gh pr *)"
+    ]
+  }
+}

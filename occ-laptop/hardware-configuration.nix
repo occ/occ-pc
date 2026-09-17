@@ -22,42 +22,40 @@
     extraModulePackages = [ ];
 
     initrd = {
-      # availableKernelModules = [ "zfs" ];
-      supportedFilesystems = [ "zfs" ];
+      availableKernelModules = [ "nvme" "xhci_pci" "thunderbolt" "usbhid" "usb_storage" "uas" "sd_mod" ];
+      kernelModules = [ ];
+
+      # Both LUKS volumes must open in initrd: root to mount, swap to
+      # resume from hibernation (see boot.resumeDevice in configuration.nix).
+      luks.devices = {
+        "luks-c4ba12bd-9720-49e9-9e76-b53c9cf759b3".device = "/dev/disk/by-uuid/c4ba12bd-9720-49e9-9e76-b53c9cf759b3";
+        "luks-6fa51307-36e9-48a7-89f2-daef74f125a7".device = "/dev/disk/by-uuid/6fa51307-36e9-48a7-89f2-daef74f125a7";
+      };
     };
 
     kernelModules = [
       "amdgpu"
       "kvm-amd"
-      "zfs"
     ];
-
-    supportedFilesystems = [ "zfs" ];
   };
 
   fileSystems."/" = {
-    device = "tank0/root";
-    fsType = "zfs";
+    device = "/dev/mapper/luks-c4ba12bd-9720-49e9-9e76-b53c9cf759b3";
+    fsType = "ext4";
   };
 
   fileSystems."/boot" = {
-    device = "/dev/disk/by-uuid/D62D-1688";
+    device = "/dev/disk/by-uuid/60E6-2929";
     fsType = "vfat";
+    options = [ "fmask=0077" "dmask=0077" ];
   };
 
   swapDevices = [
     {
-      device = "/dev/disk/by-uuid/21595e8b-385c-49f5-915d-1e7080b4a192";
+      device = "/dev/mapper/luks-6fa51307-36e9-48a7-89f2-daef74f125a7";
     }
   ];
-
-  # Enables DHCP on each ethernet and wireless interface. In case of scripted networking
-  # (the default) this is the recommended approach. When using systemd-networkd it's
-  # still possible to use this option, but it's recommended to use it in conjunction
-  # with explicit per-interface declarations with `networking.interfaces.<interface>.useDHCP`.
   networking.useDHCP = lib.mkDefault true;
-  networking.hostId = "0cc01337";
-  # networking.interfaces.wlp170s0.useDHCP = lib.mkDefault true;
 
   lib.stdenv.hostPlatform = lib.mkDefault "x86_64-linux";
   hardware.amdgpu = {

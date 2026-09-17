@@ -6,55 +6,6 @@
   inputs,
   ...
 }:
-let
-  ds4 = pkgs-unstable.stdenv.mkDerivation {
-    pname = "ds4";
-    version = "unstable-2026-07-14";
-    src = pkgs-unstable.fetchFromGitHub {
-      owner = "antirez";
-      repo = "ds4";
-      rev = "80ebbc396aee40eedc1d829222f3362d10fa4c6c";
-      hash = "sha256-Ieuc72GHZs20ModQfnvI5Me31n4Pj+WFYtsuqaKJceo=";
-    };
-
-    nativeBuildInputs = with pkgs-unstable.rocmPackages; [
-      llvm.clang clr hipblas hipblas-common hipblaslt hipcub rocblas rocprim rocwmma
-    ] ++ [ pkgs-unstable.gnumake ];
-
-    buildInputs = with pkgs-unstable.rocmPackages; [
-      hipblas hipblaslt rocblas
-    ];
-
-    preBuild = ''
-      export HIP_CLANG_PATH="${pkgs-unstable.rocmPackages.llvm.clang}/bin"
-    '';
-
-    buildPhase = ''
-      runHook preBuild
-      make strix-halo -j$NIX_BUILD_CORES ROCM_ARCH=gfx1150
-      runHook postBuild
-    '';
-
-    installPhase = ''
-      runHook preInstall
-      mkdir -p $out/bin
-      cp ds4 ds4-server ds4-bench ds4-eval ds4-agent $out/bin/
-      runHook postInstall
-    '';
-
-    CPATH = pkgs-unstable.lib.makeSearchPath "include" (with pkgs-unstable.rocmPackages; [
-      hipblas hipblas-common hipblaslt hipcub rocblas rocprim rocwmma
-    ]);
-    LIBRARY_PATH = pkgs-unstable.lib.makeLibraryPath (with pkgs-unstable.rocmPackages; [
-      hipblas hipblaslt rocblas
-    ]);
-
-    meta = with pkgs-unstable.lib; {
-      description = "DeepSeek V4 Flash/PRO local inference engine";
-      license = licenses.mit;
-    };
-  };
-in
 {
   imports = [
     ./hardware-configuration.nix
@@ -62,25 +13,13 @@ in
     inputs.nix-amd-ai.nixosModules.default
   ];
 
-  # Track nixpkgs-unstable's latest kernel (currently 7.2) + ZFS 2.4.4.
-  boot.kernelPackages = pkgs-unstable.linuxPackages_latest;
+  # Reinstalled 2026-09 on LUKS+ext4 (was ZFS): no more ZFS/kernel version
+  # coupling, track the regular latest (non-LTS) kernel from stable nixpkgs.
+  boot.kernelPackages = pkgs.linuxPackages_latest;
 
-  # Default boot.zfs.package is stable zfs (2.3.x) which caps at 6.19.
-  # Match the kernel with zfs_unstable 2.4.x (NixOS asserts version equality).
-  boot.zfs.package = pkgs-unstable.zfs_unstable;
-  # 26.11 default: refuse to force-import the root pool to avoid data loss
-  # if it is in use by another system (e.g. after an unclean shutdown).
-  boot.zfs.forceImportRoot = false;
-  # ds4 (DwarfStar) — expand GTT beyond 112 GiB to cross ds4's internal
-  # threshold (>= 112 GiB: reserve drops from 5% to 512 MiB). This frees
-  # ~4 GiB for graph buffers, potentially avoiding SSD streaming.
-  # Scaled for 125 GiB system: 112 GiB GTT, ~112 GiB TTM page limit.
-  boot.kernelParams = [
-    "iommu=pt"
-    "amdgpu.gttsize=114688"
-    "ttm.pages_limit=29360128"
-    "ttm.page_pool_size=29360128"
-  ];
+  # Hibernation: resume from the LUKS swap volume (opened in initrd by
+  # hardware-configuration.nix).
+  boot.resumeDevice = "/dev/mapper/luks-6fa51307-36e9-48a7-89f2-daef74f125a7";
 
   nixpkgs.overlays = [
     (final: prev: {
@@ -176,7 +115,7 @@ in
     amd-debug-tools
     clevis
     ddcutil
-    ds4
+
     openconnect
     gpclient
     libva-utils

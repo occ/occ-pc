@@ -10,9 +10,9 @@ Plan for running [antirez/ds4](https://github.com/antirez/ds4) — a DeepSeek V4
 | CPU | AMD Ryzen AI 9 HX 370 (24 cores) |
 | GPU | AMD Radeon 890M — gfx1150, 16 CUs, 2900 MHz |
 | RAM | 94 GiB unified (LPDDR5X) |
-| OS | NixOS unstable, kernel 7.0.14 |
+| OS | NixOS 26.05, `linuxPackages_latest` |
 | ROCm | 7.2.3 (hipcc, rocminfo, amdgpu driver) |
-| Disk | 63 GB free on `/` (ZFS, 1.8T total) |
+| Disk | 1.6T free on `/` (LUKS + ext4, 1.7T total) |
 
 **ds4 backend match:** `strix-halo` (ROCm, gfx1151). This is the exact hardware ds4 targets.
 
@@ -81,13 +81,12 @@ Some BIOSes also expose **IOMMU** as a toggle. If present, set it to
 
 ## Blockers
 
-### 1. Disk Space (CRITICAL)
+### 1. Disk Space
 
-63 GB free. Model is 81 GB. Does not fit.
-
-**Resolution options:**
+Resolved by the 2026-09 reinstall: 1.6T free on `/` (was 63 GB on ZFS).
+The 81 GB model fits with room to spare.
+If space tightens again:
 - Download to external storage: set `DS4_GGUF_DIR` to point at an external NVMe/USB drive
-- Free ~20 GB from the ZFS pool
 - Use a dedicated SSD for model storage
 
 ### 2. GPU-Visible Memory Aperture (fixable)
@@ -226,14 +225,11 @@ These are much lower than the STRIXHALO.md benchmarks (Strix Halo 8060S has
 - **gfx1150 required.** Must build with `ROCM_ARCH=gfx1150`. gfx1151 binaries
   (default) segfault on the 890M.
 - **Beta quality.** ds4 is weeks old. Expect rough edges.
-- **ZFS + kernel 7.1.** The flake overlay patches ZFS 2.4.3's META file
-  (`Linux-Maximum: 7.0` → `7.1`) and overrides the `broken` meta flag.
-  ZFS 2.4.3 already includes 7.1 kernel fixes — the version cap is stale.
 
 ## References
 
 - [STRIXHALO.md](https://github.com/antirez/ds4/blob/main/STRIXHALO.md)
 - [ds4 issue #459](https://github.com/antirez/ds4/issues/459) — BIOS UMA vs context
 - [Strix Halo Host System Configuration](https://deepwiki.com/kyuz0/amd-strix-halo-toolboxes/6.3-host-system-configuration)
-- `flake.nix` — ZFS overlay for kernel 7.1
+- `occ-laptop/ds4.nix` — GTT/TTM kernel params + ds4 package (not imported; add to `configuration.nix` imports to enable)
 - `docs/dwarfstar4.md` — this document
