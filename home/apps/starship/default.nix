@@ -7,7 +7,10 @@
 }:
 {
   programs.command-not-found.enable = true;
-  programs.fish.enable = true;
+  programs.fish = {
+    enable = true;
+    interactiveShellInit = "set -g fish_greeting";
+  };
 
   programs.starship = {
     enable = true;
