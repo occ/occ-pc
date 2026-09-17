@@ -7,7 +7,8 @@
 }:
 {
   imports = [
-    ./extensions.nix
+    ./extensions
+    ./settings.nix
   ];
 
   gtk = {
