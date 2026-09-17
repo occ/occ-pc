@@ -100,20 +100,6 @@
     smartd.enable = true;
   };
 
-  # Flatpak state (incl. remotes) lives in /var/lib/flatpak and is wiped by a
-  # reinstall. Re-add Flathub declaratively so GNOME Software's catalog survives.
-  systemd.services.flatpak-add-flathub = {
-    description = "Add Flathub remote for Flatpak";
-    after = [ "network-online.target" ];
-    wants = [ "network-online.target" ];
-    wantedBy = [ "multi-user.target" ];
-    path = [ pkgs.flatpak ];
-    serviceConfig.Type = "oneshot";
-    script = ''
-      flatpak remote-add --if-not-exists flathub \
-        https://dl.flathub.org/repo/flathub.flatpakrepo
-    '';
-  };
   services.xserver.videoDrivers = [ "amdgpu" ];
 
   hardware.graphics = {
