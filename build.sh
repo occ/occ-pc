@@ -39,9 +39,14 @@ preflight_sops() {
         return 1
       fi
       if ! env "SOPS_AGE_KEY_FILE=$key" "$sops_bin" -d "$LOGIN_SECRETS" >/dev/null 2>&1; then
-        echo "ERROR: this machine's TPM cannot decrypt $LOGIN_SECRETS via $key." >&2
-        echo "       (TPM cleared / identity regenerated?) Fix before rebuilding or you'll be locked out." >&2
-        return 1
+        # Bootstrap (fresh install / reinstall): occ has no TPM access yet
+        # (not in 'tss', no udev perms on /dev/tpmrm0). Boot-time decryption
+        # runs as root, so a root retry is the representative check.
+        if ! sudo env "PATH=$PATH" "SOPS_AGE_KEY_FILE=$key" "$sops_bin" -d "$LOGIN_SECRETS" >/dev/null 2>&1; then
+          echo "ERROR: this machine's TPM cannot decrypt $LOGIN_SECRETS via $key." >&2
+          echo "       (TPM cleared / identity regenerated?) Fix before rebuilding or you'll be locked out." >&2
+          return 1
+        fi
       fi
       echo "sops preflight OK: TPM decrypts $LOGIN_SECRETS"
       ;;
