@@ -15,6 +15,7 @@ in
     # android-nixpkgs.overlays.default
   ];
   imports = [
+    ./apps/atuin
     ./apps/browser-router
     ./apps/claude-code
     ./apps/claude-desktop
