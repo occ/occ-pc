@@ -75,7 +75,7 @@ in
     mc
     newsflash
     numbat
-    obsidian
+    parsec-bin
     resources
     signal-desktop
     # stockfish
