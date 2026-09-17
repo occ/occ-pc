@@ -3,7 +3,6 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-26.05";
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
-    nix-amd-ai.url = "github:noamsto/nix-amd-ai";
     nixos-hardware.url = "github:NixOS/nixos-hardware";
 
     home-manager = {

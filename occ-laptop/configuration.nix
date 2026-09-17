@@ -10,7 +10,6 @@
   imports = [
     ./hardware-configuration.nix
     ../shared/common.nix
-    inputs.nix-amd-ai.nixosModules.default
   ];
 
   # Reinstalled 2026-09 on LUKS+ext4 (was ZFS): no more ZFS/kernel version
@@ -102,17 +101,7 @@
     ACTION=="add", ATTRS{idVendor}=="046d", ATTRS{idProduct}=="b01d", ENV{HID_GENERIC}="0"
   '';
 
-  hardware.amd-npu = {
-    enable = true;
-    enableFastFlowLM = true;
-    enableLemonade = true;
-    enableVulkan = true;
-    enableROCm = true;
-    lemonade.user = "occ";
-  };
-
   environment.systemPackages = with pkgs; [
-    amd-debug-tools
     clevis
     ddcutil
 
