@@ -13,10 +13,8 @@
     ./caffeine.nix
     ./clipboard-history.nix
     ./desktop-cube.nix
-    ./hide-top-bar.nix
     ./just-perfection.nix
     ./kde-origin-name.nix
-    ./notification-banner-reloaded.nix
     ./tray-icons-reloaded.nix
     ./user-themes.nix
   ];
