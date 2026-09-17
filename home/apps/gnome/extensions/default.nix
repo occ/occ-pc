@@ -1,7 +1,10 @@
-{ ... }:
-# One module per extension, colocating its package with its dconf prefs.
-# This file only aggregates: it imports every extension module and owns the
-# single enabled-extensions list (a dconf list can't be split across modules).
+{ config, lib, ... }:
+# One module per extension, colocating its package, dconf prefs, and its
+# enabled-extensions entry. Each module appends its UUID to
+# `my.gnome.enabledExtensions` (a listOf str, so contributions merge across
+# modules); this file only aggregates them into the single dconf
+# enabled-extensions list -- a raw dconf list value would conflict, not merge,
+# if written from more than one module.
 {
   imports = [
     ./adaptive-brightness.nix
@@ -14,27 +17,19 @@
     ./just-perfection.nix
     ./kde-origin-name.nix
     ./notification-banner-reloaded.nix
-    ./proton-vpn-button.nix
     ./tray-icons-reloaded.nix
     ./user-themes.nix
   ];
 
-  dconf.settings."org/gnome/shell" = {
-    enabled-extensions = [
-      "user-theme@gnome-shell-extensions.gcampax.github.com"
-      # system-monitor + status-icons (gcampax) were dropped from the
-      # gnome-shell-extensions bundle and aren't installed -- enabling them
-      # here just silently failed on GNOME 50. Removed.
-      "desktop-cube@schneegans.github.com"
-      "caffeine@patapon.info"
-      "burn-my-windows@schneegans.github.com"
-      "blur-my-shell@aunetx"
-      "trayIconsReloaded@selfmade.pl"
-      "clipboard-history@alexsaveau.dev"
-      "notification-banner-reloaded@marcinjakubowski.github.com"
-      "adaptive-brightness@dmy3k.github.io"
-      "just-perfection-desktop@just-perfection"
-      "kde-origin-name@occ.me"
-    ];
+  options.my.gnome.enabledExtensions = lib.mkOption {
+    type = with lib.types; listOf str;
+    default = [ ];
+    description = ''
+      GNOME Shell extension UUIDs to enable. Each extension module appends its
+      own; aggregated here into org/gnome/shell enabled-extensions.
+    '';
   };
+
+  config.dconf.settings."org/gnome/shell".enabled-extensions =
+    config.my.gnome.enabledExtensions;
 }

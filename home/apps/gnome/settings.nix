@@ -50,6 +50,18 @@
       recent-files-max-age = -1; # keep recent files forever
     };
 
+    # Automatic timezone from geolocation. Needs location services on (below)
+    # and geoclue2, which is enabled system-wide in shared/locale.nix. No
+    # time.timeZone is hardcoded in NixOS, so timedated is free to update
+    # /etc/localtime as the fix moves.
+    "org/gnome/desktop/datetime" = {
+      automatic-timezone = true;
+    };
+
+    "org/gnome/system/location" = {
+      enabled = true;
+    };
+
     "org/gnome/desktop/search-providers" = {
       disabled = [
         "org.gnome.Epiphany.desktop"

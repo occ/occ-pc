@@ -21,4 +21,5 @@ let
 in
 {
   home.packages = [ kde-origin-name ];
+  my.gnome.enabledExtensions = [ kde-origin-name.passthru.extensionUuid ];
 }

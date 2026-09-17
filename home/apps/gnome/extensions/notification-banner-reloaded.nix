@@ -1,6 +1,7 @@
 { pkgs, ... }:
 {
   home.packages = [ pkgs.gnomeExtensions.notification-banner-reloaded ];
+  my.gnome.enabledExtensions = [ "notification-banner-reloaded@marcinjakubowski.github.com" ];
 
   dconf.settings."org/gnome/shell/extensions/notification-banner-reloaded" = {
     always-minimized = 0;

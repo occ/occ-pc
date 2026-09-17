@@ -1,6 +1,7 @@
 { pkgs, lib, ... }:
 {
   home.packages = [ pkgs.gnomeExtensions.adaptive-brightness ];
+  my.gnome.enabledExtensions = [ "adaptive-brightness@dmy3k.github.io" ];
 
   dconf.settings = {
     # Tuned brightness curve (lux-bucket lower bound, lux upper bound,
