@@ -4,7 +4,7 @@
     bold-is-bright = true
     desktop-notifications = true
     font-family = JetBrainsMono Nerd Font Mono
-    font-size = 9
+    font-size = 11
     gtk-titlebar-hide-when-maximized = true
 
     # Claude Code Integration
