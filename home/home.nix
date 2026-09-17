@@ -75,7 +75,6 @@ in
     mc
     newsflash
     numbat
-    parsec-bin
     resources
     signal-desktop
     # stockfish
