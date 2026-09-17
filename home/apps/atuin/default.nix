@@ -40,6 +40,16 @@
       auto_sync = true;
       sync_frequency = "10m";
       sync_address = "https://api.atuin.sh";
+
+      # --- AI (`?` command generation; sends OS/shell name+version only) ---
+      ai.enabled = true;
+
+      # --- daemon: persistent background process for faster search/sync ---
+      daemon = {
+        enabled = true;
+        autostart = true;
+        sync_frequency = 600;
+      };
     };
   };
 }
