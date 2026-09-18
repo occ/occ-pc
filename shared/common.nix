@@ -10,7 +10,7 @@
 
   sops.secrets.nix_cache_priv_key.sopsFile = ./common.sops.yaml;
   sops.secrets.atuin_ai_token = {
-    sopsFile = ./ai.sops.yaml;
+    sopsFile = ../secrets/atuin-ai.sops.yaml;
     owner = "occ";
     mode = "0400";
   };
