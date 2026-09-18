@@ -9,11 +9,6 @@
   system.stateVersion = "26.05";
 
   sops.secrets.nix_cache_priv_key.sopsFile = ./common.sops.yaml;
-  sops.secrets.atuin_ai_token = {
-    sopsFile = ../secrets/atuin-ai.sops.yaml;
-    owner = "occ";
-    mode = "0400";
-  };
 
   imports = [
     ./azin-vpn.nix

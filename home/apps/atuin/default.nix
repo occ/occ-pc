@@ -1,5 +1,4 @@
 {
-  lib,
   pkgs-unstable,
   ...
 }:
@@ -42,19 +41,11 @@
       sync_frequency = "10m";
       sync_address = "https://api.atuin.sh";
 
-      # --- AI (`?` command generation) ---
-      # Route to the self-hosted LiteLLM (OpenAI-compatible) proxy. "oss"
-      # protocol = talk straight to the endpoint (no Atuin Hub login flow).
-      # api_token is deliberately NOT set here: it would leak into the
-      # world-readable Nix store and git. It is injected at runtime via the
-      # ATUIN_AI__API_TOKEN env override, sourced from the sops secret in the
-      # fish init below.
-      ai = {
-        enabled = true;
-        endpoint = "https://litellm.fd.dev/v1";
-        endpoint_protocol = "oss";
-        model = "gpt-oss-120b";
-      };
+      # --- AI: disabled. The atuin CLI only speaks the Atuin protocol
+      # (/api/cli/chat) to an atuin-ai-server shim, not LiteLLM/OpenAI
+      # directly, and no shim is deployed. Disabling also drops the `?`
+      # command-generation keybind.
+      ai.enabled = false;
 
       # --- daemon: persistent background process for faster search/sync ---
       daemon = {
@@ -64,13 +55,4 @@
       };
     };
   };
-
-  # Inject the LiteLLM token from the sops-managed runtime secret (tmpfs,
-  # 0400 occ) so the plaintext never touches the Nix store or git. Scoped to
-  # interactive sessions, which is where `atuin ai` runs.
-  programs.fish.interactiveShellInit = lib.mkAfter ''
-    if test -r /run/secrets/atuin_ai_token
-        set -gx ATUIN_AI__API_TOKEN (cat /run/secrets/atuin_ai_token)
-    end
-  '';
 }
