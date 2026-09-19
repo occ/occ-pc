@@ -8,6 +8,9 @@
   nixpkgs.config.allowUnfree = true;
   system.stateVersion = "26.05";
 
+  # Prefer RAM over swap; only swap under real memory pressure.
+  boot.kernel.sysctl."vm.swappiness" = 10;
+
   sops.secrets.nix_cache_priv_key.sopsFile = ./common.sops.yaml;
 
   imports = [
